@@ -1,0 +1,38 @@
+---
+title: "punto2parcial"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+#install.packages('FRAPO')
+#library(FRAPO)
+library(expm)
+```
+
+
+Definimos las variables necesarias para la solución del problema: 
+
+```{r}
+sigma11 = rbind(c(8, 2), c(2, 5))
+sigma22 = rbind(c(6, -2), c(-2, 7))
+sigma12 = rbind(c(3, 1),  c(-1, 3))
+sigma21 = rbind(c(3, -1),  c(1, 3))
+```
+
+
+
+```{r}
+#E = solve( sqrtm(sigma11)  )  %*% sigma12 %*% solve(sigma22) %*% sigma21 %*% solve(sqrtm(sigma11))
+E = sqrtm( solve(sigma11)  )  %*% sigma12 %*% solve(sigma22) %*% sigma21 %*% sqrtm(solve(sigma11))
+E
+```
+
+```{r}
+eigen(E)
+```
+
+```{r}
+sqrt(eigen(E)$values[2])
+```
+
+Ambos métodos producen el mismo resultado por lo cual no hay uno que funcione mejor que otro. Esto puede deberse a que las varianzas entre poblaciones son muy parecidas por lo que tanto el lineal (que asume esto) como el cuadrático (que no lo hace) van a dar resultados bastante cercanos. En general ambos modelos son bastante buenos y tienen muy poco error en sus clasificaciones (3.5 %):

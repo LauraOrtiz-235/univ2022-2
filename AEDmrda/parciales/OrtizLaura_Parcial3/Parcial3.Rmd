@@ -1,0 +1,94 @@
+---
+title: "Parcial 3"
+author: "Laura Sofía Ortiz"
+date: "2022-11-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(MASS)
+library(caret)
+```
+
+```{r}
+data_set <- read.csv("/home/laura/Desktop/univ/OrtizLaura_Parcial3/abulon.csv", header=TRUE, stringsAsFactors=FALSE)
+head(data_set)
+```
+
+```{r}
+summary(data_set)
+```
+
+### Realice una clasificación del sexo utilizando discriminatnte de Fisher.
+
+Primero debemos dividir entre conjunto de entrenamiento y de validación:
+
+```{r}
+set.seed(1) # Esto permite que se muestre los mismos valores en otros pc
+
+sample <- sample(c(TRUE, FALSE), nrow(data_set), replace=TRUE, prob=c(0.75,0.25))
+train  <- data_set[sample, ]
+test   <- data_set[!sample, ]
+
+nrow(test)
+```
+
+Luego se crea el modelo (LDA)
+
+```{r}
+model_lda = lda(Sexo~. , data = train)
+model_lda
+```
+
+#### a). ¿Cúal es la probabilidad previa estimada de pertencer a cada una de las categorías?
+
+Teniendo en cuenta lo anterior podemos ver que las probabilidades previas estivadas de cada categoría son:
+
+1. 32% 
+2. 28%
+3. 40%
+
+Además, podemos notar los coeficientes de los discrimientes lineales, y la proporcion que tienen. Donde vemos que el discriminante linael 1 explica mucho más que el discrimiante lineal 2.
+
+<br />
+
+#### b). Calcule la matriz de confusión y el APER
+
+```{r}
+prediction  = predict(model_lda, test, type = "Sexo")
+lda_prediction  = factor(x = prediction$class)
+
+real = factor(x = test$Sexo)
+```
+
+```{r}
+confusionMatrix(table(real, lda_prediction))
+```
+
+La matriz de confusión es:
+
+__Confusion Matrix and Statistics__
+
+|         **Predicho**        |
+|--------|------|------|------|
+|**Real**|  35  |  28  |  90  |   
+|        |  12  | 102  |  37  |  
+|        |  32  |  36  | 109  |  
+
+```{r}
+# n1 = 153
+# n2 = 151
+# n3 = 177
+
+APER = ((28+90+37+36+32+12)/(481))*100
+APER 
+```
+
+El error del lda es del 48% (ya que hay varios errores)
+
+<br />
+
+#### c). ¿Cuál es la categoría más difícil de clasificar?
+
+La categoría más difícil de clasificar es la primera.

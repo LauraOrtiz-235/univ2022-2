@@ -1,0 +1,16 @@
+---
+title: "a"
+author: "a"
+date: "2022-10-03"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+load("/home/laura/Desktop/univ/univ2022-2/AEDmrda/Parciales_viejos/Parcial 2/plantulas.RData")
+load("/home/laura/Desktop/univ/univ2022-2/AEDmrda/Parciales_viejos/Parcial 2/abulon.RData")
+
+```

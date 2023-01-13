@@ -1,0 +1,126 @@
+---
+title: "parcial_parte_computacional"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(MASS)
+library(caret)
+```
+
+## Realice una clasifiacion del conjunto de datos wine
+
+```{r}
+dataset_ <- read.csv("/home/laura/Desktop/univ/univ2022-2/AEDmrda/Parciales_viejos/wine.csv", header=TRUE, stringsAsFactors=FALSE)
+head(dataset_)
+```
+
+```{r}
+summary(dataset_)
+```
+
+```{r}
+set.seed(1)
+
+sample <- sample(c(TRUE, FALSE), nrow(dataset_), replace=TRUE, prob=c(0.7,0.3))
+train  <- dataset_[sample, ]
+test   <- dataset_[!sample, ]
+```
+
+```{r}
+model = lda(Type~. , data = train )
+model
+```
+
+Podemos observar los coeficientes de los discrimientes lineales, y la proporcion que tienen, acá vemos que LD1 explica más que el discrimiante lineal 2. Y además, note que hay una distribución de muestras un tanto desigual en el dataset, para el tipo 1 el 33%, para el 2 el 38%, y para el 3 el 27%, esto podría llegar a afectar la calidad del clasificador. 
+
+```{r}
+prediction = predict(model, test, type = "Type")
+prediction = factor(x = prediction$class)
+labels = factor(x = test$Type)
+```
+
+Vemos los resultados de la clasificación:
+
+```{r}
+confusionMatrix(table(prediction, labels))
+```
+
+__Confusion Matrix and Statistics__
+
+|       labels                     |
+|--------        |------|------|------|
+|**Prediction**  |  *1*   |  *2*   |  *3*  |
+|     **1**      |  17    |  2     |  0  |   
+|     **2**      |  0     |  22    |  0  |  
+|     **3**      |  0     |  1     |  13 |  
+
+Note como el modelo en general no comete errores de clasificación.
+
+```{r}
+error = (0+0)/(17+22+13)
+error*100 
+```
+
+
+
+## Realice una clasifiacion del conjunto de datos Iris
+
+```{r}
+data("iris")
+
+set.seed(161)
+
+sample <- sample(c(TRUE, FALSE), nrow(iris), replace=TRUE, prob=c(0.6, 0.4))
+train  <- iris[sample, ]
+test   <- iris[!sample, ]
+```
+
+```{r}
+summary(iris)
+```
+
+### LDA:
+
+```{r}
+model_lda = lda(Species~. , data = train )
+model_lda
+```
+
+### QDA:
+
+```{r}
+model_qda = qda(Species~. , data = train)
+model_qda
+```
+
+```{r}
+lda_result  = predict(model_lda, test, type = "Species")
+lda_labels  = factor(x = lda_result$class)
+
+qda_result  = predict(model_qda, test, type = "Species")
+qda_labels  = factor(x = qda_result$class)
+
+true_labels = factor(x = test$Species)
+```
+
+```{r}
+confusionMatrix(table(lda_labels, true_labels))
+```
+
+```{r}
+confusionMatrix(table(qda_labels, true_labels))
+```
+
+El lda produce un error de 1.58%, en cambio el qda no produce ningun error.
+
+```{r}
+# ERROR DEL LDA 
+
+error = (1)/(19+20+24)
+error*100 
+```
+
+
+
