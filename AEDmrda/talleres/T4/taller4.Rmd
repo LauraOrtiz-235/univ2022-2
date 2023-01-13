@@ -1,0 +1,239 @@
+---
+title: "Taller 4"
+author: "Santiago Aillón, Santiago Arévalo, Juan José Caballero y Laura Ortiz"
+date: "2022-09-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### ***2.*** Observaciones sobre dos respuestas fueron coleccionadas para dos tratamientos. Las observaciones vectoriales $[x_1, x_2]'$ fueron:
+
+<br /> 
+
+  <center>
+  
+  $$
+  \textbf{Tratamiento 2}= \left[\begin{array}{cc} 
+  3\\
+  3
+  \end{array}\right],
+  \left[\begin{array}{cc} 
+  1\\ 
+  6
+  \end{array}\right],
+  \left[\begin{array}{cc} 
+  2\\ 
+  3
+  \end{array}\right]
+  $$  
+  $$
+  \textbf{Tratamiento 3}= \left[\begin{array}{cc} 
+  2\\
+  3
+  \end{array}\right],
+  \left[\begin{array}{cc} 
+  5\\ 
+  1
+  \end{array}\right],
+  \left[\begin{array}{cc} 
+  3\\ 
+  1
+  \end{array}\right],
+  \left[\begin{array}{cc} 
+  2\\ 
+  3
+  \end{array}\right]
+  $$  
+  </center>
+
+#### ***a.*** Calcule Spooled.
+
+<br /> 
+
+```{r}
+tratamiento2 = cbind(rbind(3,3), rbind(1,6), rbind(2,3))
+tratamiento3 = cbind(rbind(2,3), rbind(5,1), rbind(3,1), rbind(2,3))
+
+tratamiento2
+tratamiento3
+
+n2 = 3 # Tratamiento 2
+n3 = 4 # Tratamiento 3
+p = 2
+
+S2 = cov(t(tratamiento2))
+S2
+S3 = cov(t(tratamiento3))
+S3
+
+Spooled = ((n2 - 1) / (n2 + n3 - 2)) * S2 + ((n3 - 1) / (n2 + n3 - 2)) * S3
+Spooled
+
+```
+
+<br />
+
+#### ***b.*** Realice la prueba $H_0 : \mu_{2} − \mu_{3} = 0$ usando un enfoque de dos muestras con $\alpha = .01$.
+
+<br /> 
+
+```{r}
+x2_bar = (1 / n2) * (rbind(3,3) + rbind(1,6) + rbind(2,3))
+x3_bar = (1 / n3) * (rbind(2,3) + rbind(5,1) + rbind(3,1) + rbind(2,3))
+
+T2 = t(x2_bar - x3_bar) %*% solve(((1 / n2) + (1 / n3)) *Spooled) %*% (x2_bar - x3_bar)
+T2
+
+C2 = ((n2 + n3 - 2)*p / (n2 + n3 - p - 1)) * qf(0.01, p, n2 + n3 - p - 1, lower.tail = FALSE)
+C2
+
+T2 > C2
+```
+
+Se puede concluir que como $T^{2} < C^{2}$ no se recahza $H_0$.
+
+<br />
+
+#### ***c.*** Construya un intervalo de confianza simultáneo ($T^2$) del 99% para las diferencias $\mu_{2i} − \mu_{3i}$, $i = 1, 2$.
+
+<br /> 
+```{r}
+for (x in 1:2){
+lw_int = (x2_bar[x] - x3_bar[x] - sqrt((1/n2) + (1/n3)) * sqrt(Spooled[1, 1]))
+up_int = (x2_bar[x] - x3_bar[x] + sqrt((1/n2) + (1/n3)) * sqrt(Spooled[2, 2]))
+
+print(lw_int)
+print(up_int)
+}
+```
+<br /> 
+
+
+### ***4.*** La librería MASS contiene el dataset de Boston, el cual registró la variable medv (valor medio de una casa) para 506 barrios en Boston. En este ejercicio, se buscará predecir la variable medv usando 13 predictores tales como: rm (número promedio de habitaciones por casa), age (promedio de la edad de las casas), y lstat (porcentaje de hogares con bajo nivel socioeconómico).
+
+```{r}
+library(MASS)
+data(Boston)
+```
+<br /> 
+
+#### ***a.*** Realice el ajuste de regresión lineal simple usando como variable independiente lstat. Realice un resumen de los resultados (use la función summary). ¿Es la pendiente (coeficiente asociado a lstat) cero? Justifique estadísticamente su respuesta.
+
+<br /> 
+
+#### ***b.*** Determine el intervalo de confianza del 95% para los coeficientes (use la función confint().
+
+<br /> 
+
+#### ***c.*** Realice las predicciones para el valor esperado de medv y los correspondientes intervalos de confianza del 95% para los valores de lstat = c(5,10,15). Sugerencia: use predict(). Determine el intervalo de confianza para la predicción (no el valor esperado).
+
+<br /> 
+```{r}
+
+regresion = lm(medv ~ lstat, data = Boston)
+summary(regresion)
+
+confint(object = regresion, level = 0.95)
+
+pre = data.frame(lstat = c(5, 10, 15))
+predict(regresion, newdata = pre)
+```
+<br /> 
+
+#### ***d.*** Grafique el diagrama de dispersion de medv y lstat y la recta de regresión (use abline).
+
+<br /> 
+
+```{r}
+lstat = Boston$lstat
+medv = Boston$medv
+
+modelo_lineal <- lm(medv~lstat)
+
+plot(lstat, medv, main = "Diagrama de dispersión")
+abline(modelo_lineal, col = "blue")
+```
+
+<br /> 
+
+
+#### ***e.*** Realice la regresión lineal de medv utilizando todas las variables independientes. Determine los intervalos de confianza del 95% de los coeficientes asociados a las variables independientes.
+
+<br /> 
+
+##### La regresión lineal de medv utilizando todas las variables independientes es:
+```{r}
+#head(Boston)
+
+crim = Boston$crim
+zn = Boston$zn
+indus = Boston$indus
+chas = Boston$chas
+nox = Boston$nox
+rm = Boston$rm
+age = Boston$age
+dis = Boston$dis
+rad = Boston$rad
+tax = Boston$tax
+ptratio = Boston$ptratio
+black = Boston$black
+lstat = Boston$lstat
+medv = Boston$medv
+
+regresion_medv <- lm(medv~crim + zn + indus + chas + nox + rm + age + dis + rad + tax + ptratio + black + lstat)
+
+regresion_medv
+
+summary(regresion_medv)
+```
+
+<br /> 
+
+```{r}
+
+# Variables significativas
+var_signif <- c("(Intercept)", "crim", "zn", "chas", "nox", "rm", "dis", "rad", "tax", "ptratio", "black", "lstat") 
+
+```
+
+<br /> 
+
+##### Los intervalos de confianza del 95% de las variables significativas son:
+```{r}
+
+confint.lm(regresion_medv, parm = var_signif, level = 0.95)
+
+```
+
+<br /> 
+
+#### ***f.*** Con el modelo anterior (e) determine el intervalo de confianza del 95% del valor esperado de medv para el valor promedio de las variables independientes. Ahora, determine el intervalo de confianza del 95% para la predicción usando el mismo vector de entrada.
+
+<br /> 
+
+```{r}
+
+# Valor promedio de las variables independientes
+var_mean <- data.frame(crim = mean(crim), zn = mean(zn), indus = mean(indus), chas = mean(chas), nox = mean(nox), rm = mean(rm), age = mean(age), dis = mean(dis), rad = mean(rad), tax = mean(tax), ptratio = mean(ptratio), black = mean(black), lstat = mean(lstat)) 
+```
+
+<br /> 
+
+##### Intervalo de confianza:
+
+```{r}
+predict(regresion_medv, var_mean, level=0.95, interval="confidence")
+
+```
+
+<br /> 
+
+##### Intervalo de confianza para la predicción:
+
+```{r}
+predict(regresion_medv, var_mean, level=0.95, interval="prediction")
+
+```

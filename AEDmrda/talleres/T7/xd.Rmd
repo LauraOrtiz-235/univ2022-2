@@ -1,0 +1,177 @@
+---
+title: "Taller 7"
+author: "Santiago Aillón, Santiago Arévalo, Juan José Caballero y Laura Ortiz"
+date: "2022-11-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### 1. Consider the two data sets
+  
+  $$
+  X_1= \left[\begin{array}{cc} 
+  3 & 7\\
+  2 & 4\\
+  4 & 7
+  \end{array}\right]
+  X_2= \left[\begin{array}{cc} 
+  6 & 9\\
+  5 & 7\\
+  4 & 8
+  \end{array}\right]
+  $$
+<br /> 
+
+### for which
+
+
+  $$
+  \bar{x_1} = \left[\begin{array}{cc} 
+  3\\
+  6
+  \end{array}\right]
+  \bar{x_2} = \left[\begin{array}{cc} 
+  5\\
+  8
+  \end{array}\right]
+  $$  
+<br /> 
+
+### and
+
+
+  $$
+  S_{pooled} = \left[\begin{array}{cc} 
+  1 & 1\\
+  1 & 2
+  \end{array}\right]
+  $$ 
+<br /> 
+
+```{r}
+X1 = cbind(c(3, 2, 4), c(7, 4, 7))
+X2 = cbind(c(6, 5, 4), c(9, 7, 8))
+X1
+
+x1_bar = cbind(colMeans(X1))
+x2_bar = cbind(colMeans(X2))
+
+Spooled = cbind(c(1, 1), c(1, 2)) 
+```
+
+<br /> 
+
+#### a). Calculate the linear discriminant function $\hat{y} = (\bar{x_{1}} − \bar{x_{2}})'S_{pooled}^{-1} x = \hat{a}'x$.
+
+```{r}
+y_gorrito = t(x1_bar - x2_bar)%*%solve(Spooled)
+y_gorrito
+```
+
+$\hat{y} = (-2, 0) x_{0}$
+
+<br /> 
+
+#### b). Classify the observation $x_{0}'$= [ 2  7 ] as population $\pi_{1}$ or population $\pi_{2}$, using The Estimated Minimum ECM Rule for Two Normal Populations with equal priors and equal costs.
+
+```{r}
+m_gorrito = (1/2)*t(x1_bar - x2_bar)%*%solve(Spooled)%*%(x1_bar + x2_bar)
+m_gorrito
+```
+
+```{r}
+obs = c(2,7)
+y0 = y_gorrito%*%obs
+y0
+
+if (y0 >= m_gorrito){
+  sprintf("Como %.0f es mayor a %.0f entonces es de clase pi_1", y0, m_gorrito)
+
+}else{
+  sprintf("Como %.0f es menor a %.0f entonces es de clase pi_2", y0, m_gorrito)
+}
+```
+
+<br /> 
+
+#### c). Develop a linear classification function for the data using $\hat{y}$ from (a).
+
+
+<br /> 
+
+#### d). Using the function in (c) and $\hat{m} = \frac{1}{2} (\bar{x_{1}} − \bar{x_{2}})'S_{pooled}^{-1}(\bar{x_{1}} + \bar{x_{2}})$, construct the "confusion matrix" by classifying the given observations.
+
+```{r}
+n1C = 0 
+n1M = 0
+n2M = 0
+n2C = 0
+```
+
+<br /> 
+
+#### e). Given the results in (d), calculate the apparent error rate (APER).
+
+
+<br /> 
+
+### 2. Suppose that $n_{1} = 11$ and $n_{2} = 12$ observations are made on two random variables $X_{1}$ and $X_{2}$, where $X_{1}$ and $X_{2}$ are assumed to have a bivariate normal distribution with a common covariance matrix $\Sigma$, but possibly different mean vectors $\mu_{1}$ and $\mu_{2}$ for the two samples. The sample mean vectors and pooled covariance matrix are:
+
+  $$
+  \bar{x_1} = \left[\begin{array}{cc} 
+  -1\\
+  -1
+  \end{array}\right]
+  \bar{x_2} = \left[\begin{array}{cc} 
+  2\\
+  1
+  \end{array}\right]
+  $$  
+  $$
+  S_{pooled} = \left[\begin{array}{cc} 
+  7.3 & -1.1\\
+  -1.1 & 4.8
+  \end{array}\right]
+  $$ 
+ 
+<br /> 
+
+```{r}
+x1_bar2 = c(-1,-1)
+x2_bar2 = c(2,1)
+
+Spooled2 = cbind(c(7.3, -1.1), c(-1.1,4.8))
+```
+ 
+#### a). Construct Fisher’s (sample) linear discriminant function: $\hat{y} = (\bar{x_{1}} − \bar{x_{2}})'S_{pooled}^{-1} x = \hat{a}'x$.
+
+```{r}
+y_gorrito2 = t(x1_bar2 - x2_bar2)%*%solve(Spooled2)
+y_gorrito2
+```
+
+$\hat{y} = (-0.4906887, -0.5291162) x_{0}$
+
+<br /> 
+
+#### b). Assign the observation $x_{0}'$= [ 0  1 ] as population $\pi_{1}$ or population $\pi_{2}$. Assume equal costs and equal prior probabilities.
+
+```{r}
+m_gorrito2 = (1/2)*t(x1_bar2 - x2_bar2)%*%solve(Spooled2)%*%(x1_bar2 + x2_bar2)
+m_gorrito2
+```
+```{r}
+obs2 = c(0, 1)
+y02 = y_gorrito2%*%obs2
+y02
+
+if (y02 >= m_gorrito2){
+  sprintf("Como %.2f es mayor a %.2f entonces es de clase pi_1", y02, m_gorrito2)
+
+}else{
+  sprintf("Como %.2f es menor a %.2f entonces es de clase pi_2", y02, m_gorrito2)
+}
+```

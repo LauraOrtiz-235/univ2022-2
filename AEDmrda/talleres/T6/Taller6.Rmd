@@ -1,0 +1,157 @@
+---
+title: "Taller 6"
+author: "Santiago Aillón, Santiago Arévalo, Juan José Caballero y Laura Ortiz"
+date: "2022-11-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(expm)
+```
+
+
+### 1). Considere la matriz de covarianza para el vector aleatorio:
+
+<br /> 
+  
+  $$
+  \textbf{X}= \left[\begin{array}{cc} 
+  X_{1}^{(1)}\\
+  X_{2}^{(1)}\\
+  X_{1}^{(2)}\\
+  X_{2}^{(2)}\\
+  \end{array}\right]
+  $$
+  $$
+  \Sigma = \left[\begin{array}{cc} 
+  100 & 0 & 0 & 0\\
+  0 & 1 & 0.95 & 0\\
+  0 & 0.95 & 1 & 0\\
+  0 & 0 & 0 & 100\\
+  \end{array}\right]
+  $$  
+  
+<br /> 
+  
+#### Halle las variantes canónicas y las correlaciones canónicas.
+
+```{r}
+# División de la matriz sigma
+
+Sigma11 = cbind(c(100,0),c(0,1))
+Sigma21 = cbind(c(0,0.95),c(0,0))
+Sigma12 = cbind(c(0,0),c(0.95,0))
+Sigma22 = cbind(c(1,0),c(0,100))
+```
+
+```{r}
+# Cálculo de sigma11^(-1/2)*sigma12*sigma22^(-1)*sigma21*sigma11^(-1/2)
+
+Sigma_div = solve(sqrtm(Sigma11))%*%Sigma12%*%solve(Sigma22)%*%(Sigma21)%*%solve(sqrtm(Sigma11))
+Sigma_div
+
+# Valores y vectores propios para calcular a y b
+
+eigen_vec= eigen(Sigma_div)$vectors
+eigen_val= eigen(Sigma_div)$values
+```
+
+```{r}
+a1 = solve(sqrt(Sigma11))%*%eigen_vec[,1]
+a1
+```
+
+```{r}
+b_1 = solve(Sigma22)%*%Sigma21%*%a1
+b_1
+```
+
+```{r}
+# Toca escalar b1
+
+b1Scale = t(b_1)%*%Sigma22%*%b_1
+b1Scale
+
+b1 = (1/sqrt(b1Scale))%*%t(b_1)
+b1
+```
+
+##### Así, las primeras variantes canónicas son:  
+
+$U_{1} = -0.1*X_1^{(1)}+0*X_2^{(1)}$  
+
+$V_{1} = 0*X_1^{(2)}-0.1X_2^{(2)}$  
+
+##### Y las correlaciones canónicas:
+```{r}
+corr = sqrt(eigen(Sigma_div)$values)
+corr
+```
+
+##### Note que la segunda correlación es 0, es decir $U_2$ tiene una correlación de 0 con $V_2$ y no transmite información. Por otro lado, $U_1$ tiene una correlación de 0.95 con $V_1$.
+
+<br />
+
+### 2). Considere el vector aleatorio:
+
+<br /> 
+  
+  $$
+  \textbf{X}= \left[\begin{array}{cc} 
+  X_{1}^{(1)}\\
+  X_{2}^{(1)}\\
+  X_{1}^{(2)}\\
+  X_{2}^{(2)}\\
+  \end{array}\right]
+  $$
+  
+#### Con media y covarianza
+  
+  $$
+  \textbf{X}= \left[\begin{array}{cc} 
+  -3\\
+  2\\
+  0\\
+  1\\
+  \end{array}\right]
+  $$
+  
+  $$
+  \Sigma = \left[\begin{array}{cc} 
+  8 & 2 & 3 & 1\\
+  2 & 5 & -1 & 3\\
+  3 & -1 & 6 & -2\\
+  1 & 3 & -2 & 7\\
+  \end{array}\right]
+  $$  
+  
+<br /> 
+  
+#### Halle las variantes canónicas y las correlaciones canónicas.
+
+```{r}
+
+```
+
+<br /> 
+
+### 3). En un estudio de pobreza, crimen y disuasión se reportaron observaciones de las variables aleatorias: Homicidios no primarios en 1973 $(X_{1}^{(1)})$, homicidios primarios en 1973 $(X_{2}^{(1)})$, Severidad de los castigos en 1970 $(X_{1}^{(2)})$, certeza de castigo en 1970 $(X_{2}^{(2)})$. La matriz de correlación muestral de las observaciones es la siguiente:
+
+<br />
+
+$$
+  \textbf{R} = \left[\begin{array}{cc} 
+  1\\
+  0.615 & 1\\
+  -0.111 & -0.195 & 1\\
+  -0.266 & -0.085 & -0.269 & 1\\
+  \end{array}\right]
+  $$  
+<br />
+
+#### Determine las variantes y las correlaciones canónicas muestrales y halle su correlación con las variables originales. Interprete los resultados.
+
+
+
+

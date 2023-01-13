@@ -1,0 +1,622 @@
+---
+title: "Taller 3"
+author: "Santiago Aillón, Santiago Arévalo, Juan José Caballero y Laura Ortiz"
+date: "2022-09-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+### ***1.*** Un investigador considera tres  iındices para medir la severidad de los ataques alcorazon. Los valores de esos  ́ındices para n = 40 pacientes con ataque al corazon que llegan a las emergencias de un hospital producen las siguientes estadiısticas resumidas
+<br /> 
+
+  <center>
+  $\bar{X}$$=
+  \begin{bmatrix} 
+  101.3 & 63.0 & 71.0\\
+  63.0 & 80.2 & 55.6\\
+  71.0 & 55.6 & 97.4\\
+  \end{bmatrix}$
+  </center>
+
+  <br /> 
+
+  <center>
+  $S$$=
+  \begin{bmatrix}
+  46.1\\
+  57.3 \\
+  50.4 \\
+  \end{bmatrix}$
+  </center>
+
+#### ***a.*** Los tres indices son evaluados para cada paciente. Realice una prueba para la igualdad de las medias de los  indices con &alpha; = 0.05
+
+$T^2 = n \bar{\mathbb{X}}c^t(cSc^t)^{-1}c\bar{\mathbb{X}}$
+
+```{r}
+X = (c(46.1, 57.3, 50.4))
+S = cbind(c(101.3, 63.0, 71.0), c(63.0, 80.2, 55.6), c(71.0, 55.6, 97.4))
+C = rbind(c(1, -1, 0), c(1, 0 ,-1))
+Ct = t(C)
+n = 40
+q = 3
+
+csc = solve(C%*%S%*%Ct)
+
+t = n%*%X%*%Ct%*%csc%*%C%*%X
+t
+
+f = qf(1-0.05,df1=q-1,df2=n-q+1)
+
+d = (n-1)*(q-1)/(n-q+1)
+
+Ft = d*f
+Ft
+```
+
+Como $T^2 = 90.49458 > 6.660417 = \frac{(n-1)(q-1)}{(n-q+1)} * F_{q-1,n-q+1}$ rechazamos $H_0$
+<br /> 
+
+#### ***b. *** Juzgue las diferencias entre pares de las medias de los ındices usando intervalos de confianza ($T^2$) simultaneos del 95%
+
+$C^t \bar{\mathbb{X}} \pm \sqrt{\frac{(n-1)(q-1)}{(n-q+1)} * F_{q-1,n-q+1}(\alpha)} \sqrt{\frac{CSC^t}{n}}$
+
+```{r}
+n = 40
+q = 3
+X = (c(46.1, 57.3, 50.4))
+S = cbind(c(101.3, 63.0, 71.0), c(63.0, 80.2, 55.6), c(71.0, 55.6, 97.4))
+C1_2 = c(1, -1, 0)
+f = qf(1-0.05,df1=q-1,df2=n-q+1)
+
+int1_iz = C1_2 %*% X - sqrt( ((n-1)*(q-1)/(n-q-1)) * f) * sqrt( C1_2%*%S%*%C1_2/n )
+int1_iz
+
+int1_de = C1_2 %*% X + sqrt( ((n-1)*(q-1)/(n-q-1)) * f) * sqrt( C1_2%*%S%*%C1_2/n )
+int1_de
+```
+
+$-14.32326 \le \bar{\mathbb{X}}_{1-2} \le -8.076743$
+
+```{r}
+C1_3 = c(1, 0 ,-1)
+
+int1_iz = C1_3 %*% X - sqrt( ((n-1)*(q-1)/(n-q-1)) * f) * sqrt( C1_3%*%S%*%C1_3/n )
+int1_iz
+
+int1_de = C1_3 %*% X + sqrt( ((n-1)*(q-1)/(n-q-1)) * f) * sqrt( C1_3%*%S%*%C1_3/n )
+int1_de
+```
+
+$-1.143158 \le \bar{\mathbb{X}}_{1-3} \le -7.456842$
+
+### ***2.*** Observaciones sobre dos respuestas fueron coleccionadas para dos tratamientos. Las observaciones vectoriales $[x_1, x_2]'$ fueron:
+
+<br /> 
+
+  <center>
+  
+  $$
+  \textbf{Tratamiento 2}= \left[\begin{array}{cc} 
+  3\\
+  3
+  \end{array}\right],
+  \left[\begin{array}{cc} 
+  1\\ 
+  6
+  \end{array}\right],
+  \left[\begin{array}{cc} 
+  2\\ 
+  3
+  \end{array}\right]
+  $$  
+  $$
+  \textbf{Tratamiento 3}= \left[\begin{array}{cc} 
+  2\\
+  3
+  \end{array}\right],
+  \left[\begin{array}{cc} 
+  5\\ 
+  1
+  \end{array}\right],
+  \left[\begin{array}{cc} 
+  3\\ 
+  1
+  \end{array}\right],
+  \left[\begin{array}{cc} 
+  2\\ 
+  3
+  \end{array}\right]
+  $$  
+  </center>
+
+#### ***a.*** Calcule Spooled.
+
+<br /> 
+
+```{r}
+tratamiento2 = cbind(rbind(3,3), rbind(1,6), rbind(2,3))
+tratamiento3 = cbind(rbind(2,3), rbind(5,1), rbind(3,1), rbind(2,3))
+
+tratamiento2
+tratamiento3
+
+n2 = 3 # Tratamiento 2
+n3 = 4 # Tratamiento 3
+p = 2
+
+S2 = cov(t(tratamiento2))
+S2
+S3 = cov(t(tratamiento3))
+S3
+
+Spooled = ((n2 - 1) / (n2 + n3 - 2)) * S2 + ((n3 - 1) / (n2 + n3 - 2)) * S3
+Spooled
+
+```
+
+<br />
+
+#### ***b.*** Realice la prueba $H_0 : \mu_{2} − \mu_{3} = 0$ usando un enfoque de dos muestras con $\alpha = .01$.
+
+<br /> 
+
+```{r}
+x2_bar = (1 / n2) * (rbind(3,3) + rbind(1,6) + rbind(2,3))
+x3_bar = (1 / n3) * (rbind(2,3) + rbind(5,1) + rbind(3,1) + rbind(2,3))
+
+T2 = t(x2_bar - x3_bar) %*% solve(((1 / n2) + (1 / n3)) *Spooled) %*% (x2_bar - x3_bar)
+T2
+
+C2 = ((n2 + n3 - 2)*p / (n2 + n3 - p - 1)) * qf(0.01, p, n2 + n3 - p - 1, lower.tail = FALSE)
+C2
+
+T2 > C2
+```
+
+Se puede concluir que como $T^{2} < C^{2}$ no se recahza $H_0$.
+
+<br />
+
+#### ***c.*** Construya un intervalo de confianza simultáneo ($T^2$) del 99% para las diferencias $\mu_{2i} − \mu_{3i}$, $i = 1, 2$.
+
+<br /> 
+```{r}
+for (x in 1:2){
+lw_int = (x2_bar[x] - x3_bar[x] - sqrt((1/n2) + (1/n3)) * sqrt(Spooled[1, 1]))
+up_int = (x2_bar[x] - x3_bar[x] + sqrt((1/n2) + (1/n3)) * sqrt(Spooled[2, 2]))
+
+print(lw_int)
+print(up_int)
+}
+```
+<br /> 
+
+
+### ***3.*** Dados los datos
+
+$$\begin{array}{ l|rrrrr }
+       Z_1 & 10 & 5 & 7 & 19 & 11 & 18 \\
+       Z_2 & 2  & 3 & 3 &  6 &  7 & 9 \\
+\hline Y   & 15 & 9 & 3 & 25 &  7 & 13 \\
+\end{array}$$
+
+
+#### ***a.*** Ajuste el modelo de regresion lineal
+
+$$Y_j = \beta_0 + \beta_1 z_{j1} + \beta_2 z_{j2} + \epsilon_j$$ 
+$$j= 1, 2, ..., 6 $$
+
+```{r}
+Z_1 = c(10, 5, 7, 19, 11, 18)
+Z_2 = c(2, 3, 3, 6, 7, 9)
+Y = c (15, 9, 3, 25, 7, 13)
+
+modelo <- lm(Y ~ Z_1 + Z_2)
+summary(modelo) 
+
+```
+$\hat{\beta_1} = 1.7823$
+<br/>
+$\hat{\beta_2} = -2.1883$
+<br/>
+<br/>
+$Y = 3.5655 + (1.7823)Z_1 + (-2.1883)Z_2$
+<br/>
+
+#### ***b.*** Determine los intervalos de confianza del 95% simultaneos (uno a la vez) para $\beta_1$ y $\beta_2$.
+
+$\hat{\beta_i} \pm \sqrt{var{\hat{\beta_i}}}\sqrt{(r+1) F_{r+1, n-r-1}}$
+
+
+```{r}
+r = 2
+n = 6
+z0 <- rep(1,6)
+z1 <- c(10,5,7,19,11,18)
+z2 <- c( 2,3,3, 6, 7, 9)
+Z <- cbind(z0,z1,z2)
+B_1 = 1.7823
+B_2 = -2.1883
+
+err = rbind(-0.5945, 4.5054, -5.0592, 2.1180, 0.5649, -1.5347)
+err_t = cbind(-0.5945, 4.5054, -5.0592, 2.1180, 0.5649, -1.5347)
+
+S2 = ((err_t%*%err)/(n-r-1))
+var_i = S2[,1] * (solve(t(Z) %*% Z))
+
+f = qf(1 - 0.05, r+1, n - r - 1)
+
+inter1_iz = 1.7823 - sqrt(var_i[2,2]) * sqrt( (r+1)*f)
+inter1_de = 1.7823 + sqrt(var_i[2,2]) * sqrt( (r+1)*f)
+inter2_iz = -2.1883 - sqrt(var_i[3,3]) * sqrt( (r+1)*f)
+inter2_de = -2.1883 + sqrt(var_i[3,3]) * sqrt( (r+1)*f)
+```
+<br/>
+$$ -0.8458689 \le \beta_1 \le 4.410469$$
+<br/> 
+$$-7.637075 \le \beta_2 \le 3.260475$$
+
+#### ***c.*** Comprueba la prueba de hipotesis nula de que solo el coeficiente $\beta_1$ es cero.
+
+
+Note que el intervalo de confianza de $\beta_1$ quedo: 
+$$ -0.8458689 \le \beta_1 \le 4.410469$$
+Como $\beta_1$ es cero, y cero está dentro de la region de confianza, se acepta $H_0$
+
+
+<br/>
+
+#### ***d.*** Determine el valor esperado de la prediccion $E((Y))$ para $z_1 = 6$ y $z_2 = 4$. Calcule su intervalo de confianza del $95%$ correspondiente (el del valor esperado).
+
+```{r}
+betas = rbind(2.1480, 1.7823, -2.1883)
+
+z1 = 6
+z2 = 4
+Z_tem<- cbind(c(1,z1,z2))
+
+E<-t( Z_tem )%*%betas
+```
+$E(Y) = 4.0886$
+
+<br/>
+
+#### ***e.*** Determine el intervalo de confianza del $95%$ para la prediccion (Y ) cuando $z_1 = 6$ y $z_2 = 4$.
+
+```{r}
+Z
+Z_tem
+
+intervn_iz = f * sqrt( (t( Z_tem ) %*% solve( ( t( Z ) %*% Z ) ) %*% Z_tem ) %*% S2 )
+intervn_iz
+
+```
+
+
+<br/>
+
+### ***4.*** La librería MASS contiene el dataset de Boston, el cual registró la variable medv (valor medio de una casa) para 506 barrios en Boston. En este ejercicio, se buscará predecir la variable medv usando 13 predictores tales como: rm (número promedio de habitaciones por casa), age (promedio de la edad de las casas), y lstat (porcentaje de hogares con bajo nivel socioeconómico).
+
+```{r}
+library(MASS)
+data(Boston)
+```
+<br /> 
+
+#### ***a.*** Realice el ajuste de regresión lineal simple usando como variable independiente lstat. Realice un resumen de los resultados (use la función summary). ¿Es la pendiente (coeficiente asociado a lstat) cero? Justifique estadísticamente su respuesta.
+
+<br /> 
+```{r}
+
+regresion = lm(medv ~ lstat, data = Boston)
+summary(regresion)
+```
+
+Vemos que el coeficiente es distinto de 0 (-0.95), por lo cual podemos decir que esto se da ya que mientras lstat crece entonces medv decrece.
+
+#### ***b.*** Determine el intervalo de confianza del 95% para los coeficientes (use la función confint().
+
+<br /> 
+```{r}
+confint(object = regresion, level = 0.95)
+```
+
+#### ***c.*** Realice las predicciones para el valor esperado de medv y los correspondientes intervalos de confianza del 95% para los valores de lstat = c(5,10,15). Sugerencia: use predict(). Determine el intervalo de confianza para la predicción (no el valor esperado).
+
+<br /> 
+```{r}
+
+regresion = lm(medv ~ lstat, data = Boston)
+summary(regresion)
+
+confint(object = regresion, level = 0.95)
+
+pre = data.frame(lstat = c(5, 10, 15))
+predict(regresion, newdata = pre)
+```
+<br /> 
+
+#### ***d.*** Grafique el diagrama de dispersion de medv y lstat y la recta de regresión (use abline).
+
+<br /> 
+
+```{r}
+lstat = Boston$lstat
+medv = Boston$medv
+
+modelo_lineal <- lm(medv~lstat)
+
+plot(lstat, medv, main = "Diagrama de dispersión")
+abline(modelo_lineal, col = "blue")
+```
+
+<br /> 
+
+
+#### ***e.*** Realice la regresión lineal de medv utilizando todas las variables independientes. Determine los intervalos de confianza del 95% de los coeficientes asociados a las variables independientes.
+
+<br /> 
+
+##### La regresión lineal de medv utilizando todas las variables independientes es:
+```{r}
+#head(Boston)
+
+crim = Boston$crim
+zn = Boston$zn
+indus = Boston$indus
+chas = Boston$chas
+nox = Boston$nox
+rm = Boston$rm
+age = Boston$age
+dis = Boston$dis
+rad = Boston$rad
+tax = Boston$tax
+ptratio = Boston$ptratio
+black = Boston$black
+lstat = Boston$lstat
+medv = Boston$medv
+
+regresion_medv <- lm(medv~crim + zn + indus + chas + nox + rm + age + dis + rad + tax + ptratio + black + lstat)
+
+regresion_medv
+
+summary(regresion_medv)
+```
+
+<br /> 
+
+```{r}
+
+# Variables significativas
+var_signif <- c("(Intercept)", "crim", "zn", "chas", "nox", "rm", "dis", "rad", "tax", "ptratio", "black", "lstat") 
+
+```
+
+<br /> 
+
+##### Los intervalos de confianza del 95% de las variables significativas son:
+```{r}
+
+confint.lm(regresion_medv, parm = var_signif, level = 0.95)
+
+```
+
+<br /> 
+
+#### ***f.*** Con el modelo anterior (e) determine el intervalo de confianza del 95% del valor esperado de medv para el valor promedio de las variables independientes. Ahora, determine el intervalo de confianza del 95% para la predicción usando el mismo vector de entrada.
+
+<br /> 
+
+```{r}
+
+# Valor promedio de las variables independientes
+var_mean <- data.frame(crim = mean(crim), zn = mean(zn), indus = mean(indus), chas = mean(chas), nox = mean(nox), rm = mean(rm), age = mean(age), dis = mean(dis), rad = mean(rad), tax = mean(tax), ptratio = mean(ptratio), black = mean(black), lstat = mean(lstat)) 
+```
+
+<br /> 
+
+##### Intervalo de confianza:
+
+```{r}
+predict(regresion_medv, var_mean, level=0.95, interval="confidence")
+
+```
+
+<br /> 
+
+##### Intervalo de confianza para la predicción:
+
+```{r}
+predict(regresion_medv, var_mean, level=0.95, interval="prediction")
+
+```
+
+### ***5.*** Se realizan observaciones de dos respuestas sobre tres tratamientos...
+
+__A) Hacer manova__
+Creando los datos :
+
+Vector que corresponde al Tratamiento 1 
+```{r}
+vector1 <- c(2,3,7,2,7)
+vector2 <- c(9,2,5,1,5)
+Tratamiento1 <- rbind(vector1,vector2)
+Tratamiento1
+
+```
+
+Vector que corresponde al Tratamiento 2 
+```{r }
+vector3 <- c(3,2,9)
+vector4 <- c(2,4,4)
+Tratamiento2 <- rbind(vector3,vector4)
+Tratamiento2
+```
+
+Vector que corresponde al Tratamiento 3 
+```{r}
+vector5 <- c(1,7,4,3)
+vector6 <- c(4,2,9,2)
+Tratamiento3 <- rbind(vector5,vector6)
+Tratamiento3
+```
+
+
+
+
+Xbarra_l  N_l de los diferentes tratramientos
+```{r}
+n_1 <- 5 #N_l cuÃ¡ndo l = 1, es decir, n para el tratamiento 1 
+Xbarra_1 <- c(mean(vector1),mean(vector2)) #Xbarra_l cuando l = 1, es decir, El vector de medias para el tratamiento 1 
+
+n_2 <- 3  #N_l cuÃ¡ndo l = 2, es decir, n para el tratamiento 2 
+Xbarra_2 <- c(mean(vector3),mean(vector4))#Xbarra_l cuando l = 2, es decir, El vector de medias para el tratamiento 2
+
+n_3<- 4  #N_l cuÃ¡ndo l = 3, es decir, n para el tratamiento 3 
+Xbarra_3 <- c(mean(vector5),mean(vector6))#Xbarra_l cuando l = 3, es decir, El vector de medias para el tratamiento 3
+```
+
+construyendo el Xbarra General & Otros valores importantes
+```{r}
+nGeneral <- n_1 + n_2 + n_3 #Refiere al n total, basicamente la suma de 1 a g = 3 de n_l
+
+Xbarrag1 <- (sum(vector1) + sum(vector3) + sum(vector5) )/ nGeneral
+Xbarrag2 <- (sum(vector2) + sum(vector4) + sum(vector6) )/ nGeneral
+
+XbarraGeneral <- c(Xbarrag1,Xbarrag2) #Se saca la media manualmente dividiendo la sumatoria por el n general 
+XbarraGeneral
+
+g <-3
+p <-2
+n<-c(n_1,n_2,n_3)# Vector con las medias de cada tratamiento
+```
+
+
+
+Obteniendo B:
+```{r}
+Xbarra <- c(Xbarra_1,Xbarra_2,Xbarra_3)
+
+
+B <- (Xbarra_1 - XbarraGeneral) %*% t((Xbarra_1 - XbarraGeneral)) + (Xbarra_2 - XbarraGeneral) %*% t((Xbarra_2 - XbarraGeneral)) + (Xbarra_3 - XbarraGeneral) %*% t((Xbarra_3 - XbarraGeneral))
+B
+```
+Obteniendo W 
+```{r}
+W <- 0
+xjl <- 0
+for (l in 1:g){
+  for (j in 1:n[l]){
+    if(l == 1){
+      xjl <- c(vector1[j],vector2[j])
+    }else if(l == 2){
+      xjl <-c(vector3[j],vector4[j])
+     
+    }else if(l == 3){
+      xjl <- c(vector5[j],vector6[j])
+    }
+    W <- ((xjl - Xbarra[l]) %*% t(xjl - Xbarra[l])) + W
+  }
+}
+
+W
+```
+Obteniendo T
+
+```{r}
+T <- B + W
+T
+```
+
+
+
+Obteniendo las Diferencias 
+```{r}
+
+
+DiffB <- g-1
+DiffB
+DiffW <- nGeneral-g  
+DiffW
+DiffT <- nGeneral-1
+DiffT
+```
+Construllendo la tabla manova
+```{r}
+
+"B"
+B 
+DiffB
+
+"W"
+W 
+DiffW
+
+"T"
+T 
+DiffT
+```
+
+__B) Prueba de Hipótesis__
+
+Para la prueba de hipotesis, se van aevaluar lo siguientes
+
+Ho: T1=T2=T3 = 0 -> Los vectores de tratamiento son todos iguales a cero
+Ha: Ti =/= 0 para todo i -> Ninguno de los vectores de tratamiento es igual a cero 
+
+Lambda de Wilk 
+```{r}
+normW <- sqrt(sum(W**2))
+normW
+normB <- sqrt(sum(B**2))
+normB
+
+lambda <- normW/normB
+lambda
+```
+
+dado que p = 2 y g = 3 hacemos uso de la siguiente formula 
+```{r}
+
+SDfMND <-((nGeneral - g - 1)/(g-1))  * ( (1 - sqrt(lambda))/lambda)  #Sampling distribution for multivariate normal data
+SDfMND 
+```
+
+Sea alpha = 0.05 
+```{r}
+Gdl <- c((2*(g-1)),(2*(nGeneral-g-1)))
+Gdl
+f <- 3.007
+f
+```
+
+Como el valor de son de la SDfMND es menor a la F de Fisher con 4,16 grados de libertad, Rechazamos la hipotesis Ho de que los vectores de tratamientos son iguales a 0. 
+
+
+
+__C) Prueba de hipotesis considerando muestra grande __ 
+Suponiendo que n (en este caso nGeneral) es grande, usamos la siguiente formula y revisamos si tiende a una chicuadrada
+
+```{r}
+s <- -log(lambda)*(nGeneral - 1 - ((2+g)/2))
+s
+
+Gdl2 <- 2 *(g-1) 
+Gdl2
+
+
+chicuadrada <- 9.4877
+chicuadrada 
+```
+Como S = -39.88614 y la prueba de chi-cuadrada = 9.4877 es mayor, nuevamente rechazamos la hipotesis Ho 
+
+
+
+
+
+

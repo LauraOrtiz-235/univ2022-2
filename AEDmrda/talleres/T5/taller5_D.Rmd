@@ -1,0 +1,215 @@
+---
+title: "a"
+author: "a"
+date: "2022-10-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(stats)
+```
+
+
+### 1. Determine the population principal components, $Y_{1}$, $Y_{2}$ for the covariance matrix. Also, calculate the proportion of the total population variance explained by the first principal component.
+
+$$
+\Sigma = \begin{bmatrix}
+            5 & 2\\
+            2 & 2
+        \end{bmatrix}
+$$
+
+```{r}
+col1 = rbind(5, 2)
+col2 = rbind(2, 2)
+# matriz de covarianzas y varianzas
+sigma1 = cbind(col1, col2)
+print(sigma1)
+```
+
+Valores y vectores propios:
+
+```{r}
+eigen_data_varmat = eigen(sigma1)
+eigen_data_varmat
+```
+
+Porcion de la variabilidad de los datos explicada por el vector 1 de los vectores propios.
+
+```{r}
+eigen_data_var1 = eigen_data_varmat$values[1]/sum(eigen_data_varmat$values)
+eigen_data_var1
+```
+
+
+### 2. Convert the covariance matrix in Exercise 1 to a correlation matrix ρ.
+
+```{r}
+correlation_mat1 = cov2cor(sigma1)
+correlation_mat1
+```
+
+**A)  Determine the principal components $Y_1$ and $Y_2$ from $\rho$ and compute the proportion of total population variance explained by $Y_1$.**
+
+Valores y vectores propios:
+```{r}
+eigen_data_cormat1 = eigen(correlation_mat1)
+eigen_data_cormat1
+```
+
+Porcion de la variabilidad de los datos explicada por el vector 1 de los vectores propios.
+
+```{r}
+eigen_data_cor1 = eigen_data_cormat1$values[1]/sum(eigen_data_cormat1$values)
+eigen_data_cor1
+``` 
+
+
+**B)  Compare the components calculated in Part a with those obtained in Exercise 1. Are they the same? Should they be?**
+
+Hmmmmmm, no son los mismos y no deberían serlo porque la matriz de correlación me está hablando de un ángulo entre variables y con base a estos ángulos saco un vector, mientras que la matriz de de varianzas y covarianzas no lo está haciendo, además ambas matrices son diferentes, por lo que sus vectores propios y valores, no deberían ser los mismos.
+
+
+**C) Compute the correlations, $\rho_{Y_{1}, Z_{1}}$, $\rho_{Y_{1}, Z_{2}}$ and $\rho_{Y_{2}, Z_{1}}$  **
+
+Mirar pagina 225 del lb.
+
+
+### 3. Data on $x_{1} =$ sales and $x_{2} =$ profits for the 10 largest companies in the world were already listed. We know that
+
+$$ 
+\bar{x} = \begin{bmatrix}
+    155.60 \\
+    14.70
+    \end{bmatrix},  
+S = \begin{bmatrix}
+    7476.45 & 303.62 \\
+    303.62 & 26.19
+    \end{bmatrix} 
+$$
+
+
+```{r}
+xbar = rbind(155.60, 14.70)
+sigma2 = matrix(c(7476.45, 303.62, 303.62, 26.19), nrow=2, ncol=2, byrow = TRUE)
+print(xbar)
+print(sigma2)
+```
+
+**A) Determine the sample principal components and their variances for these data. (You may need the quadratic formula to solve for the eigenvalues of S). **
+
+```{r}
+eigen_data2 = eigen(sigma2)
+eigen_data2
+```
+
+**B) Find the proportion of the total sample variance explained by $\hat{y}_{1}$.**
+
+```{r}
+variation_comp1 = eigen_data2$values[1]/sum(eigen_data2$values)
+variation_comp2 = eigen_data2$values[2]/sum(eigen_data2$values)
+print(variation_comp1)
+print(variation_comp2)
+```
+
+**C) Compute the correlation coefficients $r_{\hat{y}_1,x_{k}}$, $k = 1, 2$. What interpretation, if any, can you give to the first principal component?**
+
+AAAAAAAAAAAAAAAAAAAAAAAAAAa
+AAAAAAAAAAAAAAAAAAAAAAAAAAa
+AAAAAAAAAAAAAAAAAAAAAAAAAAa
+AAAAAAAAAAAAAAAAAAAAAAAAAAa
+
+
+### 4. Convert the covariance matrix S in Exercise 3 to a sample correlation matrix R.
+
+
+```{r}
+correlation_mat2 = cov2cor(sigma2)
+correlation_mat2
+```
+
+**A) Find the sample principal components $\hat{y}_{1}$, $\hat{y}_{2}$ and their variances. **
+
+```{r}
+eigen_data_cormat2 = eigen(correlation_mat2)
+eigen_data_cormat2
+```
+
+**B) Compute the proportion of the total sample variance explained by $\hat{y}_{1}$.**
+
+
+```{r}
+variation_comp1 = eigen_data_cormat2$values[1]/sum(eigen_data_cormat2$values)
+variation_comp2 = eigen_data_cormat2$values[2]/sum(eigen_data_cormat2$values)
+print(variation_comp1)
+print(variation_comp2)
+```
+
+
+**C) Compute the correlation coefficients $r_{\hat{y}_1,x_{k}}$, $k = 1, 2$. What interpretation, if any, can you give to the first principal component?**
+
+AAAAAAAAAAAAAAAAAAAAAAAAAAa
+AAAAAAAAAAAAAAAAAAAAAAAAAAa
+AAAAAAAAAAAAAAAAAAAAAAAAAAa
+AAAAAAAAAAAAAAAAAAAAAAAAAAa
+
+
+**D) Compare the components obtained in Part a with those obtained in Exercise 3 (a) do you feel that it is better to determine principal components from the sample covariance matrix or sample correlation matrix? Explain.**
+
+Para estos datos particulares es mejor usar la matriz de covarianzas, pero puede que existan otros datos para los que sea mejor usar la matriz de correlación muestral.
+
+
+### 5. The weekly rates of return for five stocks listed on the New York Stock Exchange are given in Table 1 ( stock data.DAT ).
+
+```{r}
+stock_data = read.delim("/home/turing/Documents/aed/stock_data.txt", sep = '\t')
+stock_data
+```
+
+**B) Determine the proportion of the total sample variance explained by the first three principal components. Interpret these components. **
+
+```{r}
+sigma3 = cov(stock_data)
+sigma3
+```
+
+
+
+```{r}
+eigen_data3 = eigen(sigma3)
+eigen_data3
+```
+
+```{r}
+variation_comp1 = eigen_data3$values[1]/sum(eigen_data3$values)
+variation_comp2 = eigen_data3$values[2]/sum(eigen_data3$values)
+variation_comp3 = eigen_data3$values[3]/sum(eigen_data3$values)
+print(variation_comp1)
+print(variation_comp2)
+print(variation_comp3)
+```
+
+La variabilidad capturada por todas estas componentes es:
+
+```{r}
+print(variation_comp1 + variation_comp2 + variation_comp3)
+```
+
+**C) Given the results in Parts a-b, do you feel that the stock rates-of-return data can be summarized in fewer than five dimensions? Explain. **
+
+Si, podría resumirse en menos de 5 dimensiones, sin embargo 5 dimensiones ya es poco teniendo en cuenta que se quieren predecir datos como tasas de retorno del mercado mundial.
+
+
+### 6. Consider the census-tract data listed in Table 2 (census tract.DAT). Suppose the observations on $X_{5} =$ median value home were recorded in ten thousands, rather than hundred thousands, of dollars; that is, multiply all the numbers listed in the sixth column of the table by 10.
+
+**A) Construct the sample covariance matrix S for the census-tract data when $X5 =$ median value home is recorded in ten thousands of dollars. **
+
+
+**B) Obtain the eigenvalue-eigenvector pairs and the first two sample principal components for the covariance matrix in Part a.**
+
+
+**C) Compute the proportion of total variance explained by the first two principal components obtained in Part b. Calculate the correlation coefficients, ryi,xk, and interpret these components if possible**
+
+
+

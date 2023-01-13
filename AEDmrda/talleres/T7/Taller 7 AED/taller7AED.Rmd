@@ -1,0 +1,129 @@
+---
+title: "Taller7AED"
+author: "Estefania Laverde, Dave Alsina, MAria Fernanda Palacio"
+date: "19/5/2022"
+output:
+  html_document: default
+  pdf_document: default
+---
+# 1) Consider the two datasets
+
+```{r}
+X1 = matrix(c(3, 7, 2, 4, 4, 7), ncol = 2, nrow = 3, byrow = TRUE)
+X2 = matrix(c(6, 9, 5, 7, 4, 8), ncol = 2, nrow = 3, byrow = TRUE)
+X1
+
+x1_bar = t(rbind(colMeans(X1)))
+x2_bar = t(rbind(colMeans(X2)))
+
+Spooled = matrix(c(1, 1, 1, 2), ncol = 2, nrow = 2, byrow = TRUE) 
+```
+
+**A)** Calcule la función lineal discriminante 
+$$\hat{y} = (\bar{x}_{1} - \bar{x}_{2})'S_{pooled}^{-1}x = \hat{a}'x$$
+```{r}
+ahat = t(x1_bar-x2_bar)%*%solve(Spooled)
+ahat
+```
+Luego $\hat{y} = -2x_1$
+
+**B)** Clasifique la observación $x_{0} = [2 \;\; 7]$ como población $\pi_{1}$ o población $\pi_{2}$,
+usando el mínimo estimado regla ECM para 2 poblaciones normales con priors iguales y costos iguales.
+
+Como las probabilidades previas y los costos son iguales, calculamos $\hat{m}$, es decir, el umbral entre ambos grupos
+
+```{r}
+mhat = (1/2)*t(x1_bar-x2_bar)%*%solve(Spooled)%*%(x1_bar+x2_bar)
+mhat
+```
+Clasificamos ahora la observacion usando $\hat{y}$ evaluado en la observacion y comparandolo con $\hat{m}$
+```{r}
+obs = c(2,7)
+y0 = ahat%*%obs
+y0
+
+if (y0 >= mhat){
+  print("es de la clase pi_{1}")
+}else{
+  print("es de la clase pi_{2}")
+}
+```
+Como $-4\geq-8$, la observacion se clasifica como $\Pi_1$ 
+
+**C)** Haga una función de clasificación lineal. 
+La funcion de clasificacion lineal es 
+$$-2x_1 \geq -8$$
+para clasificar como $\Pi_1$
+
+**D)** Crear la matriz de confusion.
+
+```{r}
+classify1being2 = 0
+classify2being1 = 0
+classify1being1 = 0
+classify2being2 = 0
+
+for (i in 1:nrow(X1)) {
+  y_0x1 = ahat%*%X1[i,]
+  y_0x2 = ahat%*%X2[i,]
+  
+  if(y_0x1>=mhat){
+    classify1being1 = classify1being1+1
+  }else{
+    classify2being1 = classify2being1+1
+  }
+  
+  if(y_0x2>=mhat){
+    classify1being2 = classify1being2+1
+  }else{
+    classify2being2 = classify2being2+1
+  }
+  
+}
+
+confussion=cbind(c(classify1being1,classify1being2),c(classify2being1,classify2being2))
+confussion
+```
+
+**E)** Calcular el APER
+```{r}
+APER = (classify1being2+classify2being1)/(nrow(X1)+nrow(X2))
+APER
+```
+# 2) Suponga que $n_1 = 11$ y $n_2 = 12$...
+
+```{r}
+#Datos
+x1bar = c(-1,-1)
+x2bar = c(2,1)
+
+Spooled = cbind(c(7.3, -1.1),c(-1.1,4.8))
+```
+
+**A)** Construya la fucion discriminante de Fisher
+```{r}
+ahat2 = t(x1bar-x2bar)%*%solve(Spooled)
+ahat2
+```
+
+Entonces 
+$$ \hat{y} = -0.4906887x_1-0.5291162x_2$$
+
+**B** Asigna a la observacion dada una poblacion asumiendo costos y prob. previas iguales.
+
+```{r}
+mhat2 = (1/2)*t(x1bar-x2bar)%*%solve(Spooled)%*%(x1bar+x2bar)
+mhat2
+```
+```{r}
+obs2 = c(0, 1)
+y0 = ahat2%*%obs2
+y0
+
+if (y0 >= mhat2){
+  print("es de la clase pi_{1}")
+}else{
+  print("es de la clase pi_{2}")
+}
+```
+

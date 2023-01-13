@@ -1,0 +1,372 @@
+---
+title: "Taller 2"
+output:
+  html_document: default
+  pdf_document: default
+author: "Santiago Aillón, Santiago Arévalo, Juan José Caballero y Laura Ortiz."
+date: "Agosto del 2022"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, include=FALSE}
+```
+
+
+### **1.** Las siguientes son 5 medidas sobre las variables $x_1, x_2, x_3$:
+
+```{r}
+x1 = c(9, 2, 6, 5, 8)
+x2 = c(12, 8, 6, 4, 10)
+x3 = c(3, 4, 0, 2, 1)
+
+df = data.frame(x1, x2, x3)
+df
+```
+
+Se calcula las medias de cada variable, para obtener el vector de medias:
+
+```{r}
+X = colMeans(df)
+X
+```
+
+Se calcula la matriz de covarianzas:
+
+```{r}
+S = cov(df)
+S
+```
+
+Se calcula la matriz de correlación:
+
+```{r}
+R = cor(df)
+R
+```
+
+
+<br /> 
+
+
+### **2.** Sea $x' = [5, 1, 3]$ y $y' = [−1, 3, 1]$ 
+
+<br /> 
+
+#### a. Grafique los dos vectores.
+
+<br /> 
+
+#### b. Encuentre (i) la longitud de $x$, (ii) el ángulo entre $x$ y $y$, y (iii) la proyección de y en x.
+
+<br /> 
+
+#### c. Dado que $\bar{x} = 3$ y $\bar{y} = 1$, grafique [5 − 3, 1 − 3, 3 − 3] = [2, −2, 0] y [−1 − 1, 3 − 1, 1 − 1] = [−2, 2, 0]
+
+
+<br /> 
+
+
+### **3.** Sea: 
+
+  <center>
+  $\textbf{A}=
+  \begin{bmatrix}
+  9 & -2\\
+  -2 & 6
+  \end{bmatrix}$
+  </center>
+  
+<br /> 
+
+```{r}
+
+x1 = c(9, -2)
+x2 = c(-2, 6)
+
+A = data.frame(x1, x2)
+A
+```
+
+<br /> 
+
+#### a. ¿Es **A** una matriz simétrica?
+
+```{r}
+t(A)
+```
+
+Como la transpuesta de la matriz es igual a la misma matriz (A = A^T), A es simetrica.
+
+<br /> 
+
+#### b. Muestre que **A** es definida positiva.
+
+```{r}
+lambda = eigen(A) 
+
+lambda$values
+```
+
+Como todos los valores propios de A son positivos, A esta definida positiva.
+
+<br /> 
+
+#### c. Determine los valores y vectores propios de **A**.
+
+Vectores propios:
+
+```{r}
+lambda$vectors
+```
+
+Valores propios:
+
+```{r}
+lambda$values
+```
+
+<br /> 
+
+#### d. Encuentre la descomposición espectral de **A**.
+
+Descomposición espectral de A:
+
+```{r}
+A_desc = (lambda$values[1]*lambda$vectors[,1]%*%t(lambda$vectors[,1])) + 
+         (lambda$values[2]*lambda$vectors[,2]%*%t(lambda$vectors[,2]))
+
+A_desc
+```
+
+<br /> 
+
+#### e. Determine la inversa de **A**.
+
+```{r}
+inv_A = solve(A)
+inv_A
+```
+
+<br /> 
+
+#### f. Encuentre los valores y vectores propios de **A<sup>-1</sup>**.
+
+```{r}
+lambda_inv_A = eigen(inv_A) 
+```
+
+Vectores propios:
+
+```{r}
+lambda_inv_A$vectors
+```
+
+Valores propios:
+
+```{r}
+lambda_inv_A$values
+```
+
+
+<br /> 
+
+
+### **4.** Verifique las relaciones V <sup> 1/2 </sup> $\rho$ V <sup> 1/2 </sup> = $\Sigma$ y $\rho$ = (V <sup> 1/2 </sup>)<sup> -1 </sup> $\Sigma$ (V <sup> 1/2 </sup>)<sup> -1 </sup>, donde **$\Sigma$** es el $p × p$ matriz de covarianza poblacional, **$\rho$** es la matriz de correlación poblacional $p × p$ y V <sup> 1/2 </sup> es la matriz de desviación estándar de la población.
+
+
+<br /> 
+
+
+### **5.** Derive las expresiones para la media y las varianzas de las siguientes combinaciones lineales en términos de las medias y covarianzas de las variables aleatorias $X_1, X_2$, y $X_3$.
+
+<br /> 
+
+#### a. $X_1 − 2X_2$
+
+$E(X_1 − 2X_2) = E(X_1) - 2E(X_2)$
+
+$var(X_1 − 2X_2) = var(X_1) + 4var(X_2) - 4cov(X_1, X_2)$
+<br /> 
+$= S_{11} + 4S_{22} - 4S_{12}$  
+
+<br /> 
+
+#### b. $−X_1 + 3X_2$
+
+$E(−X_1 + 3X_2) = -E(X_1) + 3E(X_2)$
+
+$var(−X_1 + 3X_2) = var(X_1) + 9var(X_2) - 6cov(X_1, X_2)$
+<br /> 
+$= S_{11} + 9S_{22} - 6S_{12}$
+
+<br /> 
+
+#### c. $X_1 + X_2 + X_3$
+
+$E(X_1 + X_2 + X_3) = E(X_1) + E(X_2) + E(X_3)$
+
+$var(X_1 + X_2 + X_3) = var(X_1) + var(X_2) + var(X_3) + 2cov(X_1, X_2) + 2cov(X_1, X_3) 2cov(X_2, X_3)$
+<br /> 
+$= S_{11} + S_{22} + S_{33} + 2S_{12} + 2S_{13} + 2S_{23}$
+
+<br /> 
+
+#### d. $X_1 + 2X_2 − X_3$
+
+$E(X_1 + 2X_2 − X_3) = E(X_1) + 2E(X_2) - E(X_3)$
+
+$var(X_1 + 2X_2 − X_3) = var(X_1) + 4var(X_2) + var(X_3) + 4cov(X_1, X_2) - 2cov(X_1, X_3) - 4cov(X_2, X_3)$ 
+<br /> 
+$= S_{11} + 4S_{22} + S_{33} + 4S_{12} - 2S_{13} - 4S_{23}$
+
+<br /> 
+
+#### e. $3X_1 − 4X_2$, si $X_1$ y $X_2$ son variables aleatorias independientes
+
+$E(3X_1 − 4X_2) = 3E(X_1) - 4E(X_2)$
+
+$var(3X_1 − 4X_2) = 9var(X_1) + 16var(X_2) = 9S_{11} + 16S_{22}$
+
+
+<br /> 
+
+
+### **6.** Dada la matriz de datos:
+
+  <center>
+  $\textbf{X}=
+  \begin{bmatrix}
+  9 & 1\\
+  5 & 3\\
+  1 & 2
+  \end{bmatrix}$
+  </center>
+
+<br /> 
+
+#### a. Grafique el diagrama de dispersión en $p = 2$ dimensiones. Localice la media de la muestra en su diagrama.
+
+<br /> 
+
+#### b. Dibuje la representación $n = 3$ -dimensional de los datos y trace los vectores de desviación $y_1 − \bar{x}_1 1$ y $y_2 − \bar{x}_2 1$.
+
+<br /> 
+
+#### c. Dibuje los vectores de desviación en (b) que emanan del origen. Calcula las longitudes de estos vectores y el coseno del ángulo entre ellos. Relacione estas cantidades con **$S_n$** y **R**.
+
+<br /> 
+
+#### d. Calcular la varianza muestral generalizada |**S**|.
+
+
+<br /> 
+
+
+### **7.** Demuestre que |**S**| = ($s_{11}s_{22} · · · s_{pp}$)|**R**|
+
+<br /> 
+
+Note que S es la matriz de varianzas y covarianzas muestrales, además R es la matriz de correlación muestral. Tenemos la siguiente relacion entre la matriz de varianzas poblacionales y la de correlaciones poblacionales:
+
+$\Sigma$ = V <sup> 1/2 </sup> $\rho$ V <sup> 1/2 </sup>
+
+Luego se mantendría la relación con los muestrales tal que:
+
+S = V <sup> 1/2 </sup> **R** V <sup>1/2 </sup>
+
+Si sacamos determinante a ambos lados nos quedaria:
+
+|S| = |V <sup> 1/2 </sup> **R** V <sup> 1/2 </sup>|
+
+Note también que |V <sup> 1/2 </sup> **R** V <sup> 1/2 </sup>| = |V <sup> 1/2 </sup>| |**R**| |V <sup> 1/2 </sup>|
+
+Como V <sup> 1/2 </sup> es la matriz de desviación estándar, su diagonal será: $\sqrt{s_{11}}\sqrt{s_{22}}\sqrt{s_{33}} · · · \sqrt{s_{pp}}$
+y el resto de espacios es 0. Por lo tanto su determinante sera el producto de los elementos de la diagonal.
+
+Luego |S| = $\sqrt{s_{11}}\sqrt{s_{22}}\sqrt{s_{33}} · · · \sqrt{s_{pp}}$ |**R**| $\sqrt{s_{11}}\sqrt{s_{22}}\sqrt{s_{33}} · · · \sqrt{s_{pp}}$
+
+Y por lo tanto, |S| = ($s_{11}s_{22} · · · s_{pp}$)|**R**|.
+
+
+<br /> 
+
+
+### **8.** Sea V una variable aleatoria vectorial con un vector medio $E(V) = \mu_v$ y una matriz de covarianza $E(V - \mu_v)(V - \mu_v)' = \Sigma_v$. Demuestre que $E(VV') = \Sigma_v + \mu_v\mu'_v$.
+
+
+<br /> 
+
+
+### **9.** Considere una distribución normal bivariada con $\mu_1$ = 1, $\mu_2$ = 3, $\sigma_{11}$ = 2, $\sigma_{22}$ = 1 y $\rho_{12}$ = −0.8.
+
+<br /> 
+
+#### a. Escriba la densidad normal bivariada.
+
+<br /> 
+
+$\rho_{12} = \frac{\sigma_{12}}{\sqrt{\sigma_{11}}\sqrt{\sigma_{22}}}$  
+<br />
+$-0.8 = \sigma_{12} \frac{1}{\sqrt{2}\sqrt{1}}$
+<br />
+<br />
+$\sigma_{12} = -0.8\sqrt{2}$  
+
+$$
+\Sigma = \left(\begin{array}
+12 & -\sqrt{2}\cdot0.8\\
+-\sqrt{2}\cdot0.8 & 1
+\end{array}\right)
+$$
+<br />
+
+$$
+\Sigma^{-1}= \left(\begin{array}
+11.3889 & 1.5713\\
+1.5713 & 2.7778
+\end{array}\right)
+$$
+Y el determinante de esta matriz: $det(\Sigma^{-1}) = 1.3889$  
+Con estos datos entonces la formula es:  
+$f(x_{1}, x_{2}) = \frac{2}{2\pi \cdot 1.3889} \cdot exp((x_{1}-1)^2 \cdot 1.3889 + 2(x_2 -3)(x_1 -1)1.5713 + (x_2 -3)^22.7778 \cdot \frac{-1}{2})$
+
+
+#### b. Escriba la expresión de distancia estadística al cuadrado $(x − \mu)' \Sigma$ <sup> -1 </sup> $(x − \mu)$ como una función cuadrática de $x_1$ y $x_2$.
+
+<br /> 
+
+
+
+### **10.** Sea X $N_3(\mu, \Sigma)$ con $\mu' = [−3, 1, 4]$ y:
+
+<br /> 
+
+  <center>
+  $\Sigma=
+  \begin{bmatrix}
+  1 & -2 & 0\\
+  -2 & 5 & 0\\
+  0 & 0 & 2
+  \end{bmatrix}$
+  </center>
+
+<br /> 
+
+#### ¿Cuáles de las siguientes variables aleatorias son independientes? Explique.
+
+<br /> 
+
+#### a. $X_1$ y $X_2$.
+
+<br /> 
+
+#### b. $X_2$ y $X_3$.
+
+
+
+
+

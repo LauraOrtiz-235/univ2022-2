@@ -1,0 +1,235 @@
+---
+title: "taller3"
+author: "a"
+date: "2022-08-28"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### 1. Find the maximum likelihood estimates of the 2 × 1 mean vector µ and the 2 × 2 covariance matrix Σ based on the random sample.
+
+primero observemos el MLE para $\mu$:
+
+
+```{r}
+X1 = cbind(c(3, 4, 5, 4), c(6, 4, 7, 7))
+X1 = data.frame(X1)
+x1_mu = colMeans(X1)
+x1_mu
+```
+
+Ahora el MLE para $\Sigma$:
+
+```{r}
+x1_sigma = cov(X1) * (nrow(X1) - 1)/nrow(X1)
+x1_sigma
+```
+
+
+### 2. Using the data
+
+$$
+X = \begin{bmatrix}
+2 & 12\\
+8 & 9\\
+6 & 9\\
+8 & 10\\
+\end{bmatrix}
+$$
+
+```{r}
+X2 = cbind(c(2, 8, 6, 8), c(12, 9, 9, 10))
+X2 = data.frame(X2)
+```
+
+***A) Evaluate $T^{2}$, for testing $H_0$ : $\mu′ = [7, \; 11]$ , using the data***
+library(matlib)
+
+```{r}
+m0 = c(7, 11)
+mu = colMeans(X2)
+n = nrow(X2)
+# recuerde que r usa la versión incesgada (1/n-1)
+s = cov(X2)* ((n-1)/(n)) 
+t_calc = n*rbind(mu - m0) %*% solve( s ) %*% t(rbind(mu - m0))
+t_calc
+```
+
+
+***B) Specify the distribution of $T^{2}$ for the situation in (A). ***
+Dado que solo tenemos 4 mediciones por cada variable *(nuestro numero de datos es pequeño)* entonces $T^{2}$ debe seguir una distribución $F_{p, \; n - p} = F_{2, 2}$ grados de libertad.
+
+***C) Using (A) and (B), test H0 at the $\alpha = .05$ level. What conclusion do you reach? ***
+```{r}
+n = nrow(X2)
+p = ncol(X2)
+alpha = 0.05
+t_val = qf(p = 1- (alpha/2), df1 = p, df2 = n-p, lower.tail = FALSE) * ((n-1)*p)/(n-p)
+abs(t_calc) > t_val
+```
+Rechazamos $H_{0}$ ya que supera el valor t calculado.
+
+***D) Determine $\Lambda$ ***
+```{r}
+sigma_g1 = (3/4) * cov(X2)
+sigma_g1
+
+s11 = 1/4*((2-7)+(8-7)+(6-7)+(8-7))^2
+s22 = 1/4*((12-11)+(9-11)+(9-11)+(10-11))^2
+s12 = 1/4*(2-7)*(12-11)+(8-7)*(9-11)+(6-7)*(9-11)+(8-7)*(10-11)
+s21 = s12
+
+sigma_m0 = rbind(c(s11,s12),c(s21,s22))
+sigma_m0
+
+Lambda = (det(sigma_g1)/det(sigma_m0))^2
+Lambda
+```
+***E) Calcule $T^2$ usando Lambda de Wilk***
+
+```{r}
+T2 = 3*((1/sqrt(Lambda))-1)
+T2
+```
+
+3.Harry Roberts, a naturalist for the Alaska Fish and Game department, studies
+grizzly bears with the goal of maintaining a healthy population. Measurements on $n = 61$ bears provided the following summary statistics:
+
+
+$$
+S = \begin{bmatrix}
+3266.46 & 1343.97 & 731.54 & 1175.50 & 162.68 & 238.37\\
+1343.97 & 721.91 & 324.25 & 537.35 & 80.17 & 117.73\\
+731.54 & 324.25 & 179.28 & 281.17 & 39.15 & 56.80 \\
+1175.50 & 537.35 & 281.17 & 474.98 & 63.73 & 94.85\\
+162.68 & 80.17 & 39.15 & 63.73 & 9.95 & 13.88\\
+238.37 & 117.73 & 56.80 & 94.85 & 13.88 & 21.26\\
+\end{bmatrix}
+$$
+```{r eval=TRUE}
+S = matrix(c(3266.46, 1343.97, 731.54, 1175.50, 162.68, 238.37,
+             1343.97, 721.91, 324.25, 537.35, 80.17, 117.73,
+             731.54, 324.25, 179.28, 281.17, 39.15, 56.80,
+             1175.50, 537.35, 281.17, 474.98, 63.73, 94.85,
+             162.68, 80.17, 39.15, 63.73, 9.95, 13.88,
+             238.37, 117.73, 56.80, 94.85, 13.88, 21.26),byrow=FALSE,ncol=6)
+x_barra = matrix(c(95.52, 164.38, 55.69, 93.39, 17.98, 31.13), byrow = FALSE, ncol = 6) 
+p = ncol(S)
+n = 61
+```
+
+***A) Obtain the large sample $95%$ simultaneous confidence intervals for the six population mean body measurements ***
+Vamos hacer uso del intervalo de confianza de muestra grande, así que hacemos uso de:
+$a^T \bar{X} \pm \sqrt{\chi^2_p (\alpha)} \sqrt{\frac{a^T Sa}{n}}$
+Since $n = 61$, $p=6$ y $\alpha = 0.05$, y el valor de $\chi^2_p(\alpha)$
+La confianza simultánea de una muestra grande para seis medidas corporales medias de la población son las siguientes:
+$\bar{x_1} \pm \sqrt{\chi^2_p (\alpha)} \sqrt{\frac{S_{kk}}{n}}$
+```{r eval=TRUE}
+a = matrix(c(1, 0, 0, 0, 0, 0,
+             0, 1, 0, 0, 0, 0,
+             0, 0, 1, 0, 0, 0,
+             0, 0, 0, 1, 0, 0,
+             0, 0, 0, 0, 1, 0,
+             0, 0, 0, 0, 0, 1),byrow=FALSE,ncol=6)
+alpha = 0.05
+#*t(a1)%*%S%*%a1)
+ui = c()
+li = c()
+for (i in 1:nrow(a)){
+  ui <- append(ui, x_barra[i] + sqrt((p*(n-1))/(n*(n-p))*qf(1-alpha,p,n-p)*t(a[i,])%*%S%*%a[i,]))
+  
+  li <- append(li, x_barra[i] - sqrt((p*(n-1))/(n*(n-p))*qf(1-alpha,p,n-p)*t(a[i,])%*%S%*%a[i,]))
+  
+}
+ui
+li
+```
+Es decir, los intervalos fueron
+$ 123.71901 \ge \mu_1 \ge 67.32099$
+$ 177.63674 \ge \mu_2 \ge 151.12326$
+$ 62.29634 \ge \mu_3 \ge 49.08366$
+$ 104.14308 \ge \mu_4 \ge 82.63692$
+$ 19.53635 \ge \mu_5 \ge 16.42365$
+$ 33.40498 \ge \mu_6 \ge 28.85502$
+***B) Obtain the large sample $95%$ confidence ellipse for mean weight and mean girth. ***
+```{r}
+x1 = c(3266.46, 1343.97, 731.54, 1175.50, 162.68, 238.37) 
+x2 = c(1343.97, 721.91, 324.25, 537.35, 80.17, 117.73)
+x3 = c(731.54, 324.25, 179.28, 281.17, 39.15, 56.80) 
+x4 = c(1175.50, 537.35, 281.17, 474.98, 63.73, 94.85) 
+x5 = c(162.68, 80.17, 39.15, 63.73, 9.95, 13.88) 
+x6 = c(238.37, 117.73, 56.80, 94.85, 13.88, 21.26) 
+S = data.frame(x1, x2, x3, x4, x5, x6)
+S
+```
+```{r}
+sub_s = matrix( c(S[1,1], S[4,1], S[1,4], S[4,4]), ncol = 2, nrow = 2)
+eigen_decomp = eigen(sub_s) 
+#atan(y/x) = theta
+angle = atan(eigen_decomp$vectors[2,1]/eigen_decomp$vectors[1,1])
+angle
+```
+```{r}
+install.packages("plotrix")
+```
+```{r}
+library(plotrix)
+#media del peso y de la cintura
+means = c(95.52, 93.39) 
+#número de mediciones
+n = 61
+#número de variables
+p = 6
+alpha = 0.05
+#recuerde que las longitudes de los semiejes se calculan como:
+# sqrt(lambda_i) * sqrt( (p*(n-1))/(n*(n-p)) * F(alpha, p,n-p) )
+# donde n es el numero de mediciones, p el numero de variables
+len1 <- sqrt( eigen_decomp$values[1] )*sqrt( (p*(n-1))/(n*(n-p))* qf(1-alpha,p,n-p) ) 
+len2 <- sqrt( eigen_decomp$values[2] )*sqrt( (p*(n-1))/(n*(n-p))*qf(1-alpha,p,n-p) )
+lengths <- c(len1, len2)
+lengths
+```
+```{r}
+plot(0, pch='',ylab='',xlab='',xlim=c(50,150),ylim=c(80,120))
+draw.ellipse(x=means[1],y=means[2], a=lengths[1], b=lengths[2], angle=angle,deg=FALSE)
+
+abline(v=li[1],lty=3);abline(v=ui[1],lty=3)
+abline(h=li[4],lty=3);abline(h=ui[4],lty=3)
+
+```
+***C) Obtain $95%$ Bonferroni confidence intervals for the six means in Part a. ***
+El intervalo de confianza del Bonferroni $100(1-\alpha)\%$ para $\mu_i$ es
+$\bar{x_i} \pm t_{n-1} (\frac{\alpha}{2p})\sqrt{\frac{S_{ii}}{n}}$
+```{r eval=TRUE}
+
+m = 6
+
+t_bon = qt(1-alpha/(2*m),df=n-1)
+ui_b = c()
+li_b = c()
+for (i in 1:nrow(a)){
+  ui_b <- append(ui_b, x_barra[i] + t_bon * sqrt(S[i,i]/n))
+  li_b <- append(li_b, x_barra[i] - t_bon * sqrt(S[i,i]/n))
+}
+ui_b 
+li_b
+```
+$115.48669 \ge \mu_1 \ge 75.55331$
+$173.76661 \ge \mu_2 \ge 154.99339$
+$60.36771 \ge \mu_3 \ge 51.01229$
+$101.00386 \ge \mu_4 \ge 85.77614$
+$19.08199 \ge \mu_5 \ge 16.87801$
+$32.74083 \ge \mu_6 \ge 29.51917$
+
+
+***D) Refer to part b. Construct the 95% Bonferroni confidence rectangle for the mean weight and mean girth using $m=6$. Compare this rectangle with the confidence ellipse in part b. ***
+```{r eval=TRUE}
+plot(0,pch='',ylab='',xlab='',xlim=c(50,150),ylim=c(70,110))
+draw.ellipse(x=x_barra[1],y=x_barra[4],a=lengths[1],b=lengths[2],angle=angle,deg=FALSE)
+
+abline(v=li_b[1],lty=2);abline(v=ui_b[1],lty=2)
+abline(h=li_b[4],lty=2);abline(h=ui_b[4],lty=2)
+```

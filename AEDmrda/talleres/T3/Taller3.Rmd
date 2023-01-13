@@ -1,0 +1,285 @@
+---
+title: "Taller 3"
+author: "Santiago Aillón, Santiago Arévalo, Juan José Caballero y Laura Ortiz"
+date: "2022-09-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+### ***1.*** Find the maximum likelihood estimates of the 2 × 1 mean vector ***&mu;*** and the 2 × 2 covariance matrix ***&Sigma;*** based on the random sample
+<br /> 
+
+  <center>
+  $\textbf{X}=
+  \begin{bmatrix}
+  3 & 6\\
+  4 & 4\\
+  5 & 7\\
+  4 & 7\\
+  \end{bmatrix}$
+  </center>
+
+### from a bivariate normal population.
+
+```{r}
+X = cbind(c(3, 4, 5, 4), c(6, 4, 7, 7))
+X1 = data.frame(X)
+X1_mu = colMeans(X1)
+X1_mu
+```
+
+```{r}
+X1_sigma = cov(X1) * (nrow(X1) - 1) / nrow(X1)
+X1_sigma
+```
+
+
+<br /> 
+
+
+### ***2.*** Using the data:
+
+  <center>
+  $\textbf{X}=
+  \begin{bmatrix}
+  2 & 12\\
+  8 & 9\\
+  6 & 9\\
+  8 & 10\\
+  \end{bmatrix}$
+  </center>
+  
+<br />
+
+```{r}
+X2 = cbind(c(2, 8, 6, 8), c(12, 9, 9, 10))
+X2 = data.frame(X2)
+```
+
+<br /> 
+
+#### ***a.*** Evaluate <i>T<sup>2</sup></i>, for testing $H_0$ <i>: &mu;' = [7, 11]</i>, using the data.
+
+```{r}
+mu0 = c(7, 11)
+mu = colMeans(X2)
+n = nrow(X2)
+
+S = cov(X2)
+
+t2 = n * rbind(mu - mu0) %*% solve(S) %*% t(rbind(mu - mu0))
+t2
+```
+
+<br /> 
+
+#### ***b.*** Specify the distribution of <i>T<sup>2</sup></i> for the situation in (a).
+
+T<sup>2</sup> debe seguir una distribución $\frac{p(n - 1)}{n - p} F_{p, \; n - p} = 3F_{2, 2}$ grados de libertad. Es decir T<sup>2</sup> ~ $3F_{2, 2}$
+
+<br /> 
+
+#### ***c.*** Using (a) and (b), test $H_0$ at the <i>&#945; = .05</i> level. What conclusion do you reach?
+
+```{r}
+n = nrow(X2)
+p = ncol(X2)
+alpha = 0.05
+
+t2_val = qf(1 - alpha, p, n - p, lower.tail = FALSE) * (p*(n - 1)) / (n - p)
+t2_val 
+
+t2 > t2_val
+```
+
+Se puede concluir que como t2 > t2_val, se rechaza $H_{0}$.
+
+<br /> 
+
+#### ***d.*** Determine <i>&#923;</i>.
+
+<br /> 
+
+#### ***e.*** Using the Wilk’s Lambda (d), calculate <i>T<sup>2</sup></i>.
+
+
+<br /> 
+
+
+### ***3.*** Harry Roberts, a naturalist for the Alaska Fish and Game department, studies grizzly bears with the goal of maintaining a healthy population. Measurements on <i>n = 61</i> bears provided the following summary statistics:
+
+<br /> 
+
+<html>
+<style>
+table, th, td {
+  border:1px solid black;
+}
+</style>
+<body>
+
+<table style="width:100%">
+  <tr>
+    <th>Variable</th>
+    <th>Weight(kg)</th>
+    <th>Body length(cm)</th>
+    <th>Neck</th>
+    <th>Girth</th>
+    <th>Head length</th>
+    <th>Head width</th>
+  </tr>
+  <tr>
+    <td>Sample mean x̄</td>
+    <td>95.52</td>
+    <td>164.38</td>
+    <td>55.69</td>
+    <td>93.39</td>
+    <td>17.98</td>
+    <td>31.13</td>
+  </tr>
+
+</table>
+
+</body>
+</html>
+
+
+<br /> 
+
+  <center>
+  $\textbf{Covariance matrix S}=
+  \begin{bmatrix}
+  3266.46 & 1343.97 & 731.54 & 1175.50 & 162.68 & 238.37\\
+  1343.97 & 721.91 & 324.25 & 537.35 & 80.17 & 117.73\\
+  731.54 & 324.25 & 179.28 & 281.17 & 39.15 & 56.80\\
+  1175.50 & 537.35 & 281.17 & 474.98 & 63.73 & 94.85\\
+  162.68 & 80.17 & 39.15 & 63.73 & 9.95 & 13.88\\
+  238.37 & 117.73 & 56.80 & 94.85 & 13.88 & 21.26\\
+  \end{bmatrix}$
+  </center>
+  
+<br />
+
+```{r eval=TRUE}
+covS = matrix(c(3266.46, 1343.97, 731.54, 1175.50, 162.68, 238.37,
+                1343.97, 721.91, 324.25, 537.35, 80.17, 117.73,
+                731.54, 324.25, 179.28, 281.17, 39.15, 56.80,
+                1175.50, 537.35, 281.17, 474.98, 63.73, 94.85,
+                162.68, 80.17, 39.15, 63.73, 9.95, 13.88,
+                238.37, 117.73, 56.80, 94.85, 13.88, 21.26), byrow=FALSE, ncol=6)
+
+x_bar = matrix(c(95.52, 164.38, 55.69, 93.39, 17.98, 31.13), byrow=FALSE, ncol=6)
+
+p = ncol(covS)
+n = 61
+```
+
+<br /> 
+
+#### ***a.*** Obtain the large sample 95% simultaneous confidence intervals for the six population mean body measurements.
+
+El intervalo de confianza simultáneo es:
+
+$a' \bar{X} \pm \sqrt{\frac{p(n - 1)}{n(n - p)} F_{p, n - p} (\alpha) a'Sa}$
+
+Teniendo en cuenta que n es grande, los intervalos de confianza simultáneos de una muestra grande para seis medidas corporales medias de la población, estaran dados por:
+
+$\bar{x_1} \pm \sqrt{\frac{p(n - 1)}{(n - p)} F_{p, n - p} (\alpha)} \sqrt{\frac{S_{kk}}{n}}$
+
+```{r eval=TRUE}
+a = matrix(c(1, 0, 0, 0, 0, 0,
+             0, 1, 0, 0, 0, 0,
+             0, 0, 1, 0, 0, 0,
+             0, 0, 0, 1, 0, 0,
+             0, 0, 0, 0, 1, 0,
+             0, 0, 0, 0, 0, 1), byrow=FALSE, ncol=6)
+
+alpha = 0.05
+
+upr_interval = c()
+lwr_interval = c()
+
+for (i in 1:nrow(a)){
+  
+  upr_interval = append(upr_interval, x_bar[i] + sqrt((p*(n - 1))/(n*(n - p)) * qf(1 - alpha, p, n - p)*t(a[i,]) %*% covS %*% a[i,]))
+  
+  lwr_interval = append(lwr_interval, x_bar[i] - sqrt((p*(n - 1))/(n*(n - p)) * qf(1 - alpha, p, n - p)*t(a[i,]) %*% covS %*% a[i,]))
+  
+}
+
+upr_interval
+lwr_interval
+
+```
+
+Los intervalos simultáneos fueron:
+
+67.32099 &le; $\mu_1$ &le; 123.71901 
+<br /> 
+151.12326 &le; $\mu_2$ &le; 177.63674 
+<br /> 
+49.08366 &le; $\mu_3$ &le; 62.29634 
+<br /> 
+82.63692 &le; $\mu_4$ &le; 104.14308 
+<br /> 
+16.42365 &le; $\mu_5$ &le; 19.53635 
+<br /> 
+28.85502 &le; $\mu_6$ &le; 33.40498 
+
+<br /> 
+
+#### ***b.*** Obtain the large sample 95% confidence ellipse for mean weight and mean girth.
+
+<br /> 
+```{r}
+x1 = c(3266.46, 1343.97, 731.54, 1175.50, 162.68, 238.37) 
+x2 = c(1343.97, 721.91, 324.25, 537.35, 80.17, 117.73)
+x3 = c(731.54, 324.25, 179.28, 281.17, 39.15, 56.80) 
+x4 = c(1175.50, 537.35, 281.17, 474.98, 63.73, 94.85) 
+x5 = c(162.68, 80.17, 39.15, 63.73, 9.95, 13.88) 
+x6 = c(238.37, 117.73, 56.80, 94.85, 13.88, 21.26) 
+S = data.frame(x1, x2, x3, x4, x5, x6)
+S
+```
+```{r}
+sub_s = matrix( c(covS[1,1], covS[4,1], covS[1,4], covS[4,4]), ncol = 2, nrow = 2)
+eigen_decomp = eigen(sub_s) 
+
+#atan(y/x) = theta
+angle = atan(eigen_decomp$vectors[2,1]/eigen_decomp$vectors[1,1])
+angle
+```
+```{r}
+install.packages("plotrix")
+```
+```{r}
+library(plotrix)
+
+#media del peso y de la cintura
+means = c(95.52, 93.39) 
+n = 61
+p = 6
+alpha = 0.05
+
+len1 <- sqrt( eigen_decomp$values[1] )*sqrt( (p*(n-1))/(n*(n-p))* qf(1-alpha,p,n-p) ) 
+len2 <- sqrt( eigen_decomp$values[2] )*sqrt( (p*(n-1))/(n*(n-p))*qf(1-alpha,p,n-p) )
+lengths <- c(len1, len2)
+lengths
+```
+```{r}
+plot(0, pch='',ylab='',xlab='',xlim=c(50,150),ylim=c(80,120))
+draw.ellipse(x=means[1],y=means[2], a=lengths[1], b=lengths[2], angle=angle,deg=FALSE)
+
+abline(v=lwr_interval[1],lty=3);abline(v=upr_interval[1],lty=3)
+abline(h=lwr_interval[4],lty=3);abline(h=upr_interval[4],lty=3)
+```
+
+#### ***c.*** Obtain the 95% Bonferroni confidence intervals for the six means in Part (a).
+
+<br /> 
+
+#### ***d.*** Refer to Part (b). Construct the 95% Bonferroni confidence rectangle for the mean weight and mean girth using <i>m = 6</i>. Compare this rectangle with the confidence ellipse in Part (b).
